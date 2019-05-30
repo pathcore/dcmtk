@@ -1,3 +1,8 @@
+# Enable use of <PackageName>_ROOT in find scripts.
+IF(POLICY CMP0074)
+    CMAKE_POLICY(SET CMP0074 NEW)
+ENDIF()
+
 # Find TIFF
 IF(DCMTK_WITH_TIFF)
   FIND_PACKAGE(TIFF QUIET)
