@@ -98,3 +98,8 @@ dcmsr/apps/xml2dsr
 dcmsr/tests/mkreport
 dcmwlm/apps/wlmscpfs
 dcmwlm/tests/wltest
+
+# Ignore common build dirs
+build
+build-*
+cmake-build-*

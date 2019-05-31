@@ -20,17 +20,13 @@ This module will set the following variables in your project:
 
 ``LibXml2_FOUND``
   true if libxml2 headers and libraries were found
-``LIBXML2_INCLUDE_DIR``
+``LibXml2_INCLUDE_DIR``
   the directory containing LibXml2 headers
-``LIBXML2_INCLUDE_DIRS``
+``LibXml2_INCLUDE_DIRS``
   list of the include directories needed to use LibXml2
-``LIBXML2_LIBRARIES``
+``LibXml2_LIBRARIES``
   LibXml2 libraries to be linked
-``LIBXML2_DEFINITIONS``
-  the compiler switches required for using LibXml2
-``LIBXML2_XMLLINT_EXECUTABLE``
-  path to the XML checking tool xmllint coming with LibXml2
-``LIBXML2_VERSION_STRING``
+``LibXml2_VERSION_STRING``
   the version of LibXml2 found (since CMake 2.8.8)
 
 Cache variables
@@ -38,65 +34,73 @@ Cache variables
 
 The following cache variables may also be set:
 
-``LIBXML2_INCLUDE_DIR``
+``LibXml2_INCLUDE_DIR``
   the directory containing LibXml2 headers
-``LIBXML2_LIBRARY``
+``LibXml2_LIBRARY``
   path to the LibXml2 library
 #]=======================================================================]
 
-# use pkg-config to get the directories and then use these values
-# in the find_path() and find_library() calls
-find_package(PkgConfig QUIET)
-PKG_CHECK_MODULES(PC_LIBXML QUIET libxml-2.0)
-set(LIBXML2_DEFINITIONS ${PC_LIBXML_CFLAGS_OTHER})
-
-find_path(LIBXML2_INCLUDE_DIR NAMES libxml/xpath.h
+find_path(LibXml2_INCLUDE_DIR NAMES libxml/xpath.h
    HINTS
-   ${PC_LIBXML_INCLUDEDIR}
-   ${PC_LIBXML_INCLUDE_DIRS}
-   PATH_SUFFIXES libxml
+   PATH_SUFFIXES libxml2
    )
 
-# CMake 3.9 and below used 'LIBXML2_LIBRARIES' as the name of
-# the cache entry storing the find_library result.  Use the
-# value if it was set by the project or user.
-if(DEFINED LIBXML2_LIBRARIES AND NOT DEFINED LIBXML2_LIBRARY)
-  set(LIBXML2_LIBRARY ${LIBXML2_LIBRARIES})
-endif()
+message("LibXml2_INCLUDE_DIR --> ${LibXml2_INCLUDE_DIR}")
 
-find_library(LIBXML2_LIBRARY NAMES xml2 libxml2
-   HINTS
-   ${PC_LIBXML_LIBDIR}
-   ${PC_LIBXML_LIBRARY_DIRS}
-   )
-
-find_program(LIBXML2_XMLLINT_EXECUTABLE xmllint)
-# for backwards compat. with KDE 4.0.x:
-set(XMLLINT_EXECUTABLE "${LIBXML2_XMLLINT_EXECUTABLE}")
-
-if(PC_LIBXML_VERSION)
-    set(LIBXML2_VERSION_STRING ${PC_LIBXML_VERSION})
-elseif(LIBXML2_INCLUDE_DIR AND EXISTS "${LIBXML2_INCLUDE_DIR}/libxml/xmlversion.h")
-    file(STRINGS "${LIBXML2_INCLUDE_DIR}/libxml/xmlversion.h" libxml2_version_str
+if(LibXml2_INCLUDE_DIR AND EXISTS "${LibXml2_INCLUDE_DIR}/libxml/xmlversion.h")
+    file(STRINGS "${LibXml2_INCLUDE_DIR}/libxml/xmlversion.h" libxml2_version_str
          REGEX "^#define[\t ]+LIBXML_DOTTED_VERSION[\t ]+\".*\"")
 
     string(REGEX REPLACE "^#define[\t ]+LIBXML_DOTTED_VERSION[\t ]+\"([^\"]*)\".*" "\\1"
-           LIBXML2_VERSION_STRING "${libxml2_version_str}")
+           LibXml2_VERSION_STRING "${libxml2_version_str}")
     unset(libxml2_version_str)
 endif()
 
-set(LIBXML2_INCLUDE_DIRS ${LIBXML2_INCLUDE_DIR} ${PC_LIBXML_INCLUDE_DIRS})
-set(LIBXML2_LIBRARIES ${LIBXML2_LIBRARY})
+message("LibXml2_VERSION_STRING --> ${LibXml2_VERSION_STRING}")
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+set(LibXml2_NAMES ${LibXml2_NAMES} libxml2)
+foreach(name ${LibXml2_NAMES})
+  list(APPEND LibXml2_NAMES_DEBUG "${name}d")
+endforeach()
+
+if(NOT LibXml2_LIBRARY)
+  find_library(LibXml2_LIBRARY_RELEASE NAMES ${LibXml2_NAMES})
+  find_library(LibXml2_LIBRARY_DEBUG NAMES ${LibXml2_NAMES_DEBUG})
+  include(SelectLibraryConfigurations)
+  select_library_configurations(LibXml2)
+  mark_as_advanced(LibXml2_LIBRARY_RELEASE LibXml2_LIBRARY_DEBUG)
+endif(NOT LibXml2_LIBRARY)
+unset(LibXml2_NAMES)
+unset(LibXml2_NAMES_DEBUG)
+
+message("LibXml2_LIBRARY --> ${LibXml2_LIBRARY}")
+
+set(LibXml2_INCLUDE_DIRS ${LibXml2_INCLUDE_DIR})
+set(LibXml2_LIBRARIES ${LibXml2_LIBRARY})
+
+include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibXml2
-                                  REQUIRED_VARS LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR
-                                  VERSION_VAR LIBXML2_VERSION_STRING)
+                                  REQUIRED_VARS LibXml2_LIBRARY LibXml2_INCLUDE_DIR
+                                  VERSION_VAR LibXml2_VERSION_STRING)
 
-mark_as_advanced(LIBXML2_INCLUDE_DIR LIBXML2_LIBRARY LIBXML2_XMLLINT_EXECUTABLE)
+mark_as_advanced(LibXml2_INCLUDE_DIR LibXml2_LIBRARY)
 
 if(LibXml2_FOUND AND NOT TARGET LibXml2::LibXml2)
   add_library(LibXml2::LibXml2 UNKNOWN IMPORTED)
-  set_target_properties(LibXml2::LibXml2 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${LIBXML2_INCLUDE_DIRS}")
-  set_property(TARGET LibXml2::LibXml2 APPEND PROPERTY IMPORTED_LOCATION "${LIBXML2_LIBRARY}")
+  set_target_properties(LibXml2::LibXml2 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${LibXml2_INCLUDE_DIRS}")
+  set_property(TARGET LibXml2::LibXml2 APPEND PROPERTY IMPORTED_LOCATION "${LibXml2_LIBRARY}")
+  if(EXISTS "${LibXml2_LIBRARY_RELEASE}")
+    set_property(TARGET LibXml2::LibXml2 APPEND PROPERTY
+      IMPORTED_CONFIGURATIONS RELEASE)
+    set_target_properties(LibXml2::LibXml2 PROPERTIES
+      IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C"
+      IMPORTED_LOCATION_RELEASE "${LibXml2_LIBRARY_RELEASE}")
+  endif()
+  if(EXISTS "${LibXml2_LIBRARY_DEBUG}")
+    set_property(TARGET LibXml2::LibXml2 APPEND PROPERTY
+      IMPORTED_CONFIGURATIONS DEBUG)
+    set_target_properties(LibXml2::LibXml2 PROPERTIES
+      IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
+      IMPORTED_LOCATION_DEBUG "${LibXml2_LIBRARY_DEBUG}")
+  endif()
 endif()

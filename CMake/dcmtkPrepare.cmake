@@ -58,13 +58,13 @@ set(DCMTK_PACKAGE_VERSION_SUFFIX "")
 SET(DCMTK_LIBRARY_PROPERTIES VERSION "${DCMTK_ABI_VERSION}.${DCMTK_PACKAGE_VERSION}" SOVERSION "${DCMTK_ABI_VERSION}")
 
 # General build options and settings
-option(BUILD_APPS "Build command line applications and test programs." ON)
-option(BUILD_SHARED_LIBS "Build with shared libraries." OFF)
-option(BUILD_SINGLE_SHARED_LIBRARY "Build a single DCMTK library." OFF)
-mark_as_advanced(BUILD_SINGLE_SHARED_LIBRARY)
-set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Library postfix for debug builds. Usually left blank.")
-# add our CMake modules to the module path, but prefer the ones from CMake.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_ROOT}/Modules" "${CMAKE_CURRENT_SOURCE_DIR}/${DCMTK_CMAKE_INCLUDE}/CMake/")
+OPTION(BUILD_APPS "Build command line applications and test programs." ON)
+OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF)
+OPTION(BUILD_SINGLE_SHARED_LIBRARY "Build a single DCMTK library." OFF)
+MARK_AS_ADVANCED(BUILD_SINGLE_SHARED_LIBRARY)
+SET(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Library postfix for debug builds. Usually left blank.")
+# add our CMake modules to the module path, but prefer ours
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${DCMTK_CMAKE_INCLUDE}/CMake/" "${CMAKE_ROOT}/Modules")
 # newer CMake versions will warn if a module exists in its and the project's module paths, which is now always
 # the case since above line adds CMake's module path to the project's one. It, therefore, doesn't matter whether
 # we set the policy to OLD or NEW, since in both cases CMake's own module will be preferred. We just set
