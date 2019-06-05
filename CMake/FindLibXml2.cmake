@@ -45,8 +45,6 @@ find_path(LibXml2_INCLUDE_DIR NAMES libxml/xpath.h
    PATH_SUFFIXES libxml2
    )
 
-message("LibXml2_INCLUDE_DIR --> ${LibXml2_INCLUDE_DIR}")
-
 if(LibXml2_INCLUDE_DIR AND EXISTS "${LibXml2_INCLUDE_DIR}/libxml/xmlversion.h")
     file(STRINGS "${LibXml2_INCLUDE_DIR}/libxml/xmlversion.h" libxml2_version_str
          REGEX "^#define[\t ]+LIBXML_DOTTED_VERSION[\t ]+\".*\"")
@@ -56,9 +54,7 @@ if(LibXml2_INCLUDE_DIR AND EXISTS "${LibXml2_INCLUDE_DIR}/libxml/xmlversion.h")
     unset(libxml2_version_str)
 endif()
 
-message("LibXml2_VERSION_STRING --> ${LibXml2_VERSION_STRING}")
-
-set(LibXml2_NAMES ${LibXml2_NAMES} libxml2)
+set(LibXml2_NAMES ${LibXml2_NAMES} xml2 libxml2)
 foreach(name ${LibXml2_NAMES})
   list(APPEND LibXml2_NAMES_DEBUG "${name}d")
 endforeach()
@@ -72,8 +68,6 @@ if(NOT LibXml2_LIBRARY)
 endif(NOT LibXml2_LIBRARY)
 unset(LibXml2_NAMES)
 unset(LibXml2_NAMES_DEBUG)
-
-message("LibXml2_LIBRARY --> ${LibXml2_LIBRARY}")
 
 set(LibXml2_INCLUDE_DIRS ${LibXml2_INCLUDE_DIR})
 set(LibXml2_LIBRARIES ${LibXml2_LIBRARY})
