@@ -26,6 +26,52 @@ set(DCMTK_WITH_ICU @DCMTK_WITH_ICU@)
 set(DCMTK_WITH_WRAP @DCMTK_WITH_WRAP@)
 set(DCMTK_WITH_DOXYGEN @DCMTK_WITH_DOXYGEN@)
 
+include(CMakeFindDependencyMacro)
+if(DCMTK_WITH_TIFF)
+  find_dependency(TIFF)
+  find_dependency(JPEG)
+endif()
+
+if(DCMTK_WITH_PNG)
+  find_dependency(PNG)
+endif()
+
+if(DCMTK_WITH_XML)
+  find_dependency(LibXml2)
+endif()
+
+if(DCMTK_WITH_ZLIB)
+  find_dependency(ZLIB)
+endif()
+
+if(DCMTK_WITH_OPENSSL)
+  find_dependency(OpenSSL)
+endif()
+
+if(DCMTK_WITH_SNDFILE)
+  message(AUTHOR_WARNING "Support for SNDFILE not supported yet!")
+endif()
+
+if(DCMTK_WITH_ICONV)
+  message(AUTHOR_WARNING "Support for Iconv not supported yet!")
+endif()
+
+if(DCMTK_WITH_STDLIBC_ICONV)
+  message(AUTHOR_WARNING "Support for Iconv not supported yet!")
+endif()
+
+if(DCMTK_WITH_ICU)
+  find_dependency(ICU COMPONENTS uc data)
+endif()
+
+if(DCMTK_WITH_WRAP)
+  message(AUTHOR_WARNING "Support for TCPWRAP not supported yet!")
+endif()
+
+if(DCMTK_WITH_DOXYGEN)
+  message(AUTHOR_WARNING "Support for Doxygen not supported yet!")
+endif()
+
 # Dictionary-related
 set(DCMTK_ENABLE_BUILTIN_DICTIONARY @DCMTK_ENABLE_BUILTIN_DICTIONARY@)
 set(DCMTK_ENABLE_EXTERNAL_DICTIONARY @DCMTK_ENABLE_EXTERNAL_DICTIONARY@)
