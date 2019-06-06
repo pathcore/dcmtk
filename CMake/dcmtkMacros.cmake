@@ -113,7 +113,7 @@ endmacro()
 macro(DCMTK_TARGET_LINK_LIBRARIES LIBRARY)
     set(DCMTK_LIBRARY_DEPENDENCIES ${DCMTK_LIBRARY_DEPENDENCIES} ${ARGN} CACHE INTERNAL "Dependencies of the DCMTK libraries.")
     # The name of this macro doesn't match, but it does just what we need here
-    DCMTK_TARGET_LINK_MODULES(${LIBRARY} ${ARGN})
+    DCMTK_TARGET_LINK_MODULES(${LIBRARY}${DCMTK_LIBRARY_SUFFIX} ${ARGN})
 endmacro()
 
 #
@@ -131,7 +131,7 @@ macro(DCMTK_TARGET_LINK_MODULES TARGET)
     # 3. When "just" BUILD_APPS is disabled, only call it for libs, not for apps
     # These rules boil down to: If CMake knows the target (this handles all
     # cases for apps) and we aren't building a single library (case 2)
-    if(TARGET ${TARGET} AND NOT BUILD_SINGLE_SHARED_LIBRARY)
+    if(TARGET ${TARGET})
         target_link_libraries(${TARGET} ${ARGN})
     endif()
 endmacro()
